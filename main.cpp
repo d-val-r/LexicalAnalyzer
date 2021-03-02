@@ -1,3 +1,4 @@
+# include <fstream>
 # include <iostream>
 # include <vector>
 # include <map>
@@ -23,10 +24,15 @@ public:
 		}	
 
 	}
+	
 };
 
 
 int main()
 {
+	ifstream file("tokenlexemedata.txt");
+	l.read();
+	
+
 	return 0;
 }
