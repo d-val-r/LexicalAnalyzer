@@ -1,3 +1,8 @@
+/*
+Assignment 2 for CSCE 306, Spring 2021 (Dr. St. Clair)
+Written by David Rudenya
+*/
+
 # include <fstream>
 # include <iostream>
 # include <vector>
@@ -10,6 +15,78 @@ private:
 	vector<string> lexemes;
 	vector<string> tokens;
 	map<string, string> tokenmap;
+
+	bool isNumber(char a)
+	{
+		bool is_number = false;
+		switch (a)
+		{
+			case 48:
+				is_number = true;
+				break;
+			case 49:
+				is_number = true;
+				break;
+			case 50:
+				is_number = true;
+				break;
+			case 51:
+				is_number = true;
+				break;
+			case 52:
+				is_number = true;
+				break;
+			case 53:
+				is_number = true;
+				break;
+			case 54:
+				is_number = true;
+				break;
+			case 55:
+				is_number = true;
+				break;
+			case 56:
+				is_number = true;
+				break;
+			case 57:
+				is_number = true;
+				break;
+
+		}
+
+		return is_number;
+	}
+
+
+	string identifier_handler(string line, istream& infile)
+	{
+		string identifier = "";
+		int i;
+
+		if (isNumber(line[0]))
+		{
+			cout << "invalid variable name" << endl;
+		} else
+		{
+			i = 0;
+			while (i < line.length() && line[i] != '=' && line[i] != ';')
+			{
+				identifier += line[i];
+				i++;
+			}
+			cout << "t_id" << " : " << identifier << endl;
+			
+			if (i >= line.length())
+			{
+				cout << "recursive call" << endl;
+				infile >> line;
+				identifier += identifier_handler(line, infile);
+			}	
+		}
+		
+
+		return identifier;
+	}
 
 	
 public:
@@ -30,12 +107,11 @@ public:
 	// not to console
 	void scanFile(istream& infile)
 	{
-		string identifier = "";
 		string line;
-		int i;	
 		infile >> line;
+		bool error = false;
 
-		while (!infile.eof())
+		while (!infile.eof() && !error)
 		{
 			
 			if(line == "begin")
@@ -57,31 +133,19 @@ public:
 			}else if(line == "integer")
 			{
 				cout << tokenmap["t_integer"] << " : " << line << endl;
-				if (line[line.length() - 1] != ';')
-				{
-					infile >> line;
-					if (sizeof(line[0]) != 1)
-					{
-						cout << "invalid variable name" << endl;
-					} else
-					{
-						i = 0;
-						while (i < line.length() && line[i] != '=' && line[i] != ';')
-						{
-							identifier += line[i];
-							i++;
-						}
-						cout << "t_id" << " : " << identifier << endl;
-						identifier = "";
-					
-					}
-				}
+				infile >> line;
+				identifier_handler(line, infile);	
 				
 			}else if(line == "string")
 			{
 				cout << tokenmap["t_string"] << " : " << line << endl;
 				if (sizeof(line[0] != 1))
 						cout << "invalid variable name" << endl;
+				else if(line[line.length() - 1] != ';')
+				{
+					identifier_handler(line, infile);	
+				}
+
 
 			}else if(line == "loop")
 			{
