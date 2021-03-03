@@ -26,44 +26,155 @@ public:
 		}	
 
 	}
-
-	string scanFile(istream& infile)
+	// do not forget to update statements to output to a file,
+	// not to console
+	void scanFile(istream& infile)
 	{
-		string message = "";
-		string buffer;
-		int start_quote = -1;
-	        int end_quote = -1;	
-		int i = 0;
+		string identifier = "";
+		string line;
+		int i;	
+		infile >> line;
+
 		while (!infile.eof())
 		{
-			getline(infile, buffer);
-			while (buffer[i] != ';' && i < buffer.length())	
-			{
-				if (buffer[i] == '"' && start_quote == -1)
-					start_quote = i;
-				else if (buffer[i] == '"' && start_quote != -1)
-					end_quote = i;
-				message += buffer[i];
-				i++;
-			}
 			
-			// the thing causing the program to not read a semicolon inside
-			// quotes improperly is most likely here
-			if (start_quote != -1 && end_quote == -1 || i >= buffer.length())
-				continue;
-			else
+			if(line == "begin")
 			{
-				start_quote = end_quote = -1;	
-				i = 0;
+				cout << tokenmap["t_begin"] << " : " << line << endl;
 			}
-		}		
-		cout << start_quote << endl;
-		cout << end_quote << endl;
-		cout << i << endl;
-		return message;
-	}
+			else if(line == "end")
+			{
+				cout << tokenmap["t_end"] << " : " << line << endl;
+			}else if(line == "else")
+			{
+				cout << tokenmap["t_else"] << " : " << line << endl;
+			}else if(line == "if")
+			{
+				cout << tokenmap["t_if"] << " : " << line << endl;
+			}else if(line == "input")
+			{
+				cout << tokenmap["t_input"] << " : " << line << endl;
+			}else if(line == "integer")
+			{
+				cout << tokenmap["t_integer"] << " : " << line << endl;
+				if (line[line.length() - 1] != ';')
+				{
+					infile >> line;
+					if (sizeof(line[0]) != 1)
+					{
+						cout << "invalid variable name" << endl;
+					} else
+					{
+						i = 0;
+						while (i < line.length() && line[i] != '=' && line[i] != ';')
+						{
+							identifier += line[i];
+							i++;
+						}
+						cout << "t_id" << " : " << identifier << endl;
+						identifier = "";
+					
+					}
+				}
+				
+			}else if(line == "string")
+			{
+				cout << tokenmap["t_string"] << " : " << line << endl;
+				if (sizeof(line[0] != 1))
+						cout << "invalid variable name" << endl;
+
+			}else if(line == "loop")
+			{
+				cout << tokenmap["t_loop"] << " : " << line << endl;
+			}else if(line == "main()")
+			{
+				cout << tokenmap["t_main"] << " : " << "main" << endl;
+				cout << tokenmap["s_lparen"] << " : " << "(" << endl;
+				cout << tokenmap["s_rparen"] << " : " << ")" << endl;
+			}else if(line == "main")
+			{
+				cout << tokenmap["t_main"] << " : " << line << endl;
+			}else if(line == "output")
+			{
+				cout << tokenmap["t_output"] << " : " << line << endl;
+			}else if(line == "then")
+			{
+				cout << tokenmap["t_then"] << " : " << line << endl;
+			}else if(line == "var")
+			{
+				cout << tokenmap["t_var"] << " : " << line << endl;
+			}else if(line == "while")
+			{
+				cout << tokenmap["t_while"] << " : " << line << endl;
+			}else if (line == tokenmap["s_assign"])
+			{
+				cout << tokenmap["s_assign"] << " : " << line << endl;
+			}else if (line == tokenmap["s_comma"])
+			{
+				cout << tokenmap["s_coma"] << " : " << line << endl;
+			}else if (line == tokenmap["s_lparen"])
+			{
+				cout << tokenmap["s_lparen"] << " : " << line << endl;
+			}else if (line == tokenmap["s_rparen"])
+			{
+				cout << tokenmap["s_rparen"] << " : " << line << endl;
+			}else if (line == tokenmap["s_semi"])
+			{
+				cout << tokenmap["s_semi"] << " : " << line << endl;
+			}else if (line == tokenmap["s_lt"])
+			{
+				cout << tokenmap["s_lt"] << " : " << line << endl;
+			}else if (line == tokenmap["s_le"])
+			{
+				cout << tokenmap["s_le"] << " : " << line << endl;
+			}else if (line == tokenmap["s_gt"])
+			{
+				cout << tokenmap["s_gt"] << " : " << line << endl;
+			}else if (line == tokenmap["s_ge"])
+			{
+				cout << tokenmap["s_ge"] << " : " << line << endl;
+			}else if (line == tokenmap["s_eq"])
+			{
+				cout << tokenmap["s_eq"] << " : " << line << endl;
+			}else if (line == tokenmap["s_ne"])
+			{
+				cout << tokenmap["s_ne"] << " : " << line << endl;
+			}else if (line == tokenmap["s_plus"])
+			{
+				cout << tokenmap["s_plus"] << " : " << line << endl;
+			}else if (line == tokenmap["s_minus"])
+			{
+				cout << tokenmap["s_minus"] << " : " << line << endl;
+			}else if (line == tokenmap["s_mult"])
+			{
+				cout << tokenmap["s_mult"] << " : " << line << endl;
+			}else if (line == tokenmap["s_div"])
+			{
+				cout << tokenmap["s_div"] << " : " << line << endl;
+			}else if (line == tokenmap["s_mod"])
+			{
+				cout << tokenmap["s_mod"] << " : " << line << endl;
+			}else if (line == tokenmap["s_and"])
+			{
+				cout << tokenmap["s_and"] << " : " << line << endl;
+			}else if (line == tokenmap["s_or"])
+			{
+				cout << tokenmap["s_or"] << " : " << line << endl;
+			}else if (line == tokenmap["s_not"])
+			{
+				cout << tokenmap["s_not"] << " : " << line << endl;
+			}
+
+
+			infile >> line;
+		}	
+		//if (line[line.length()-1] != ';')
+		// do we need to check if the program ends with a semicolon?
+		}
+				
+	};
 	
-};
+
 
 
 int main()
@@ -75,11 +186,10 @@ int main()
 	cin >> source_code;
 
 	ifstream source(source_code);
-
 	LexAnalyzer l(file);
 
-	string x = l.scanFile(source);
-	cout << x << endl;
+	l.scanFile(source);
+
 
 	// ARE RANDOM STRINGS CONSIDERED VALID SYNTAX?
 	// ex:
