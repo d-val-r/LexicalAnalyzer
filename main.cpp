@@ -16,45 +16,23 @@ private:
 	vector<string> tokens;
 	map<string, string> tokenmap;
 
-	bool isNumber(char a)
+	bool isNumber(int a)
 	{
 		bool is_number = false;
-		switch (a)
+		if (a < 65 || a > 122)
 		{
-			case 48:
-				is_number = true;
-				break;
-			case 49:
-				is_number = true;
-				break;
-			case 50:
-				is_number = true;
-				break;
-			case 51:
-				is_number = true;
-				break;
-			case 52:
-				is_number = true;
-				break;
-			case 53:
-				is_number = true;
-				break;
-			case 54:
-				is_number = true;
-				break;
-			case 55:
-				is_number = true;
-				break;
-			case 56:
-				is_number = true;
-				break;
-			case 57:
-				is_number = true;
-				break;
-
+			is_number = true;	
 		}
 
 		return is_number;
+	}
+
+	bool hasAlpha(int a)
+	{
+		bool has_alpha = false;
+		if (a > 65 && a < 122)
+			has_alpha = true;
+		return has_alpha;
 	}
 
 
@@ -62,26 +40,23 @@ private:
 	{
 		string identifier = "";
 		int i;
+		bool has_alpha = false;
 
 		if (isNumber(line[0]))
 		{
-			cout << "invalid variable name" << endl;
+			identifier = "invalid variable name";
 		} else
 		{
 			i = 0;
 			while (i < line.length() && line[i] != '=' && line[i] != ';')
 			{
 				identifier += line[i];
+				has_alpha = hasAlpha(line[i]);
 				i++;
 			}
-			cout << "t_id" << " : " << identifier << endl;
-			
-			if (i >= line.length())
-			{
-				cout << "recursive call" << endl;
-				infile >> line;
-				identifier += identifier_handler(line, infile);
-			}	
+
+		if (!has_alpha)	
+			identifier = "invalid variable name";
 		}
 		
 
@@ -134,19 +109,21 @@ public:
 			{
 				cout << tokenmap["t_integer"] << " : " << line << endl;
 				infile >> line;
-				identifier_handler(line, infile);	
-				
+				line = identifier_handler(line, infile);	
+				if (line == "invalid variable name")
+					error = true;	
+				 
+				cout << "t_id" << " : " << line << endl;
 			}else if(line == "string")
+				// is string a keyword for variable declaration or
+				// is it meant to identiy string literals?
 			{
 				cout << tokenmap["t_string"] << " : " << line << endl;
-				if (sizeof(line[0] != 1))
-						cout << "invalid variable name" << endl;
-				else if(line[line.length() - 1] != ';')
-				{
-					identifier_handler(line, infile);	
-				}
-
-
+				infile >> line;
+				line = identifier_handler(line, infile);	
+				if (line == "invalid variable name")
+					error = true;	
+				cout << "t_id" << " : " << line << endl; 
 			}else if(line == "loop")
 			{
 				cout << tokenmap["t_loop"] << " : " << line << endl;
@@ -227,7 +204,9 @@ public:
 			}else if (line == tokenmap["s_not"])
 			{
 				cout << tokenmap["s_not"] << " : " << line << endl;
-			}
+			} // include an else portion that will parse a line
+			  // like, say, x5=;, because otherwise, it will read
+			  // it as one line and it won't match anyhthing above
 
 
 			infile >> line;
