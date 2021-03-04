@@ -43,7 +43,7 @@ private:
 	bool isSymbol(char a)
 	{
 		bool is_symbol = false;
-		if (!isNumber(a) && !isAlpha(a))
+		if (!isNumber(a) && !isAlpha(a) && !isWhiteSpace(a) && a != '"')
 			is_symbol = true;
 
 		return is_symbol;
@@ -62,38 +62,13 @@ private:
 		int TAB = 9;
 		int SPACE = 32;
 
-		if (a == TAB && a == SPACE)
+		if (a == TAB || a == SPACE)
 			is_white_space = true;
 		
 		return is_white_space;
 	}
 
-	string identifier_handler(string line, istream& infile)
-	{
-		string identifier = "";
-		int i;
-		bool has_alpha = false;
-
-		if (isNumber(line[0]))
-		{
-			identifier = "invalid variable name";
-		} else
-		{
-			i = 0;
-			while (i < line.length() && line[i] != '=' && line[i] != ';')
-			{
-				identifier += line[i];
-				has_alpha = isAlpha(line[i]);
-				i++;
-			}
-
-		if (!has_alpha)	
-			identifier = "invalid variable name";
-		}
-		
-
-		return identifier;
-	}
+	
 
 
 	bool search_map_for(string target)
@@ -115,6 +90,19 @@ private:
 		string x = " ";
 		x[0] = a;
 		return search_map_for(x);
+	}
+
+	string getString(string line, int& i)
+	{
+		string parsed = "";
+		while (line[i] != '"' && i < line.length())
+			{
+				parsed += line[i];
+				i++;
+			}
+		
+		return parsed;
+
 	}
 	
 public:
@@ -153,15 +141,21 @@ public:
 			{
 				if (line[i] == '"')
 				{
-					if (start_quote == -1) // find a way to handle one line with multiple strings
-							      // if user writes "asdlflhjk" as;dlk ", then what do I do with the
-							      // stray double quote?
-						start_quote = i;
-					else
-						end_quote = i;	
+					i++;
+					parsed += getString(line, i);	
+					while (i >= line.length() && !line[line.length()-1] == '"' && !infile.eof()) 
+					{
+						getline(infile, line);
+
+						i = 0;
+						parsed += getString(line, i);
+					}
+
+					outfile << "t_string : " << parsed << endl; 
+					
 				} else if (isAlpha(line[i]))
 				{
-					while (!isSymbol(line[i]) && i < line.length())
+					while (i < line.length() && !isSymbol(line[i]) && !isWhiteSpace(line[i]) && line[i] != '"')
 					{
 						parsed += line[i]; 
 						i++;
@@ -169,7 +163,12 @@ public:
 
 					if (isSymbol(line[i]) && !search_map_for(line[i]))
 					{
-						outfile << "invalid identifier";
+						cout << "This symbol: " << line[i] << endl;
+						outfile << "invalid identifier" << endl;
+					} else
+					{
+						outfile << "t_id : " << parsed << endl;
+						parsed = "";
 					}
 				} else if(isSymbol(line[i]))
 				{
@@ -183,6 +182,7 @@ public:
 				i++;
 			}
 
+			i = 0;
 			getline(infile, line);
 		}
 	}
