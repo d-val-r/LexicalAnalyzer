@@ -143,15 +143,19 @@ public:
 				{
 					i++;
 					parsed += getString(line, i);	
-					while (i >= line.length() && !line[line.length()-1] == '"' && !infile.eof()) 
+					while (i <= line.length() && line[line.length()-1] != '"' && !infile.eof()) 
 					{
 						getline(infile, line);
-
+						parsed += ' ';
 						i = 0;
 						parsed += getString(line, i);
 					}
 
-					outfile << "t_string : " << parsed << endl; 
+					if (infile.eof() && line[line.length()-1] != '"')
+					{	error = true;
+						outfile << "Error: unclosed string";
+					} else
+						outfile << "t_string : " << parsed << endl; 
 					
 				} else if (isAlpha(line[i]))
 				{
