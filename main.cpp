@@ -19,22 +19,54 @@ private:
 	bool isNumber(int a)
 	{
 		bool is_number = false;
-		if (a < 65 || a > 122)
-		{
+
+		if (a > 47 && a < 58)
 			is_number = true;	
-		}
 
 		return is_number;
 	}
 
-	bool hasAlpha(int a)
+	bool isAlpha(char a)
 	{
-		bool has_alpha = false;
-		if (a > 64 && a < 123)
-			has_alpha = true;
-		return has_alpha;
+		a = (int) a;
+		bool is_alpha = false;
+
+		if (a > 64 && a < 91 || a > 96 && a < 123)
+			is_alpha = true;
+
+		return is_alpha;
 	}
 
+
+		
+
+	bool isSymbol(char a)
+	{
+		bool is_symbol = false;
+		if (!isNumber(a) && !isAlpha(a))
+			is_symbol = true;
+
+		return is_symbol;
+	}
+
+	
+
+	bool isWhiteSpace(char a)
+	{	
+		a = (int) a;
+		bool is_white_space = false;
+
+		// ASCII codes for tab and space whitespace chars	
+		// is it better to make variables to make it obvious, or
+		// to just use the numbers in the comparison to save memory?
+		int TAB = 9;
+		int SPACE = 32;
+
+		if (a == TAB && a == SPACE)
+			is_white_space = true;
+		
+		return is_white_space;
+	}
 
 	string identifier_handler(string line, istream& infile)
 	{
@@ -51,7 +83,7 @@ private:
 			while (i < line.length() && line[i] != '=' && line[i] != ';')
 			{
 				identifier += line[i];
-				has_alpha = hasAlpha(line[i]);
+				has_alpha = isAlpha(line[i]);
 				i++;
 			}
 
@@ -64,14 +96,25 @@ private:
 	}
 
 
-	void parse(string line)
+	bool search_map_for(string target)
 	{
-		int i = 0;
-		string word = "";
-		while ((int) line[i] > 47 && (int) line[i] < 58 || (int) line[i] > 65 && (int) line[i] < 123)
+		map<string, string>::iterator itr = tokenmap.begin();
+		bool found = false;
+		while (!found && itr != tokenmap.end())
 		{
-			word += line[i]; 
-		}		
+			if (itr->second == target)
+				found = true;
+			itr++;
+		}	
+
+		return found;
+	}
+
+	bool search_map_for(char a)
+	{
+		string x = " ";
+		x[0] = a;
+		return search_map_for(x);
 	}
 	
 public:
@@ -88,136 +131,60 @@ public:
 		}	
 
 	}
-	// do not forget to update statements to output to a file,
-	// not to console
+	
+	
 	void scanFile(istream& infile, ostream& outfile)
-	{
-		string line;
-		string addon;
-		infile >> line;
+	{	
+				
 		bool error = false;
+		int i = 0;
+		string parsed = "";
+		
+		
+		string line;
+		getline(infile, line);
 
-		while (!infile.eof() && !error)
+		int start_quote = -1;
+		int end_quote = -1;		
+		
+		while (!infile.eof())
 		{
-			
-			if(line == "begin")
+			while (i < line.length() && !error)
 			{
-				outfile << tokenmap["t_begin"] << " : " << line << endl;
+				if (line[i] == '"')
+				{
+					if (start_quote == -1) // find a way to handle one line with multiple strings
+							      // if user writes "asdlflhjk" as;dlk ", then what do I do with the
+							      // stray double quote?
+						start_quote = i;
+					else
+						end_quote = i;	
+				} else if (isAlpha(line[i]))
+				{
+					while (!isSymbol(line[i]) && i < line.length())
+					{
+						parsed += line[i]; 
+						i++;
+					}
+
+					if (isSymbol(line[i]) && !search_map_for(line[i]))
+					{
+						outfile << "invalid identifier";
+					}
+				} else if(isSymbol(line[i]))
+				{
+					if (!(i > start_quote && i < end_quote))
+					{
+						if (!(search_map_for(line[i])))
+							outfile << "Invalid symbol";
+					}
+				}
+
+				i++;
 			}
-			else if(line == "end")
-			{
-				outfile << tokenmap["t_end"] << " : " << line << endl;
-			}else if(line == "else")
-			{
-				outfile << tokenmap["t_else"] << " : " << line << endl;
-			}else if(line == "if")
-			{
-				outfile << tokenmap["t_if"] << " : " << line << endl;
-			}else if(line == "input")
-			{
-				outfile << tokenmap["t_input"] << " : " << line << endl;
-			}else if(line == "integer")
-			{
-				outfile << tokenmap["t_integer"] << " : " << line << endl;
-				infile >> line;
-				line = identifier_handler(line, infile);	
-				if (line == "invalid variable name")
-					error = true;	
-				 
-				outfile << "t_id" << " : " << line << endl;
-			}else if(line == "string")
-				// is string a keyword for variable declaration or
-				// is it meant to identiy string literals?
-			{
-				outfile << tokenmap["t_string"] << " : " << line << endl;
-				infile >> line;
-				line = identifier_handler(line, infile);	
-				if (line == "invalid variable name")
-					error = true;	
-				outfile << "t_id" << " : " << line << endl; 
-			}else if(line == "loop")
-			{
-				outfile << tokenmap["t_loop"] << " : " << line << endl;
-			}else if(line == "main")
-			{
-				outfile << tokenmap["t_main"] << " : " << line << endl;
-			}else if(line == "output")
-			{
-				outfile << tokenmap["t_output"] << " : " << line << endl;
-			}else if(line == "then")
-			{
-				outfile << tokenmap["t_then"] << " : " << line << endl;
-			}else if(line == "var")
-			{
-				outfile << tokenmap["t_var"] << " : " << line << endl;
-			}else if(line == "while")
-			{
-				outfile << tokenmap["t_while"] << " : " << line << endl;
-			}else if (line == tokenmap["s_assign"])
-			{
-				outfile << tokenmap["s_assign"] << " : " << line << endl;
-			}else if (line == tokenmap["s_comma"])
-			{
-				outfile << tokenmap["s_coma"] << " : " << line << endl;
-			}else if (line == tokenmap["s_lparen"])
-			{
-				outfile << tokenmap["s_lparen"] << " : " << line << endl;
-			}else if (line == tokenmap["s_rparen"])
-			{
-				outfile << tokenmap["s_rparen"] << " : " << line << endl;
-			}else if (line == tokenmap["s_semi"])
-			{
-				outfile << tokenmap["s_semi"] << " : " << line << endl;
-			}else if (line == tokenmap["s_lt"])
-			{
-				outfile << tokenmap["s_lt"] << " : " << line << endl;
-			}else if (line == tokenmap["s_le"])
-			{
-				outfile << tokenmap["s_le"] << " : " << line << endl;
-			}else if (line == tokenmap["s_gt"])
-			{
-				outfile << tokenmap["s_gt"] << " : " << line << endl;
-			}else if (line == tokenmap["s_ge"])
-			{
-				outfile << tokenmap["s_ge"] << " : " << line << endl;
-			}else if (line == tokenmap["s_eq"])
-			{
-				outfile << tokenmap["s_eq"] << " : " << line << endl;
-			}else if (line == tokenmap["s_ne"])
-			{
-				outfile << tokenmap["s_ne"] << " : " << line << endl;
-			}else if (line == tokenmap["s_plus"])
-			{
-				outfile << tokenmap["s_plus"] << " : " << line << endl;
-			}else if (line == tokenmap["s_minus"])
-			{
-				outfile << tokenmap["s_minus"] << " : " << line << endl;
-			}else if (line == tokenmap["s_mult"])
-			{
-				outfile << tokenmap["s_mult"] << " : " << line << endl;
-			}else if (line == tokenmap["s_div"])
-			{
-				outfile << tokenmap["s_div"] << " : " << line << endl;
-			}else if (line == tokenmap["s_mod"])
-			{
-				outfile << tokenmap["s_mod"] << " : " << line << endl;
-			}else if (line == tokenmap["s_and"])
-			{
-				outfile << tokenmap["s_and"] << " : " << line << endl;
-			}else if (line == tokenmap["s_or"])
-			{
-				outfile << tokenmap["s_or"] << " : " << line << endl;
-			}else if (line == tokenmap["s_not"])
-			{
-				outfile << tokenmap["s_not"] << " : " << line << endl;
-			} else
-			{
-				getline(infile, addon);
-				line += addon;
-				parse(line);
-			}	
-			infile >> line;
-		}	
+
+			getline(infile, line);
+		}
 	}
 				
 };
