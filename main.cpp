@@ -164,12 +164,15 @@ public:
 						parsed += line[i]; 
 						i++;
 					}
-
+					
 					if (isSymbol(line[i]) && !search_map_for(line[i]))
 					{
-						cout << "This symbol: " << line[i] << endl;
 						outfile << "invalid identifier" << endl;
-					} else
+					} else if(search_map_for(parsed))
+					{
+						outfile << tokenmap[parsed] << " : " << parsed << endl;
+					}
+					else
 					{
 						outfile << "t_id : " << parsed << endl;
 						parsed = "";
