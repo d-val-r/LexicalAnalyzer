@@ -30,7 +30,7 @@ private:
 	bool hasAlpha(int a)
 	{
 		bool has_alpha = false;
-		if (a > 65 && a < 122)
+		if (a > 64 && a < 123)
 			has_alpha = true;
 		return has_alpha;
 	}
@@ -63,6 +63,16 @@ private:
 		return identifier;
 	}
 
+
+	void parse(string line)
+	{
+		int i = 0;
+		string word = "";
+		while ((int) line[i] > 47 && (int) line[i] < 58 || (int) line[i] > 65 && (int) line[i] < 123)
+		{
+			word += line[i]; 
+		}		
+	}
 	
 public:
 	LexAnalyzer(istream& infile)
@@ -83,6 +93,7 @@ public:
 	void scanFile(istream& infile, ostream& outfile)
 	{
 		string line;
+		string addon;
 		infile >> line;
 		bool error = false;
 
@@ -127,11 +138,6 @@ public:
 			}else if(line == "loop")
 			{
 				outfile << tokenmap["t_loop"] << " : " << line << endl;
-			}else if(line == "main()")
-			{
-				outfile << tokenmap["t_main"] << " : " << "main" << endl;
-				outfile << tokenmap["s_lparen"] << " : " << "(" << endl;
-				outfile << tokenmap["s_rparen"] << " : " << ")" << endl;
 			}else if(line == "main")
 			{
 				outfile << tokenmap["t_main"] << " : " << line << endl;
@@ -204,18 +210,17 @@ public:
 			}else if (line == tokenmap["s_not"])
 			{
 				outfile << tokenmap["s_not"] << " : " << line << endl;
-			} // include an else portion that will parse a line
-			  // like, say, x5=;, because otherwise, it will read
-			  // it as one line and it won't match anyhthing above
-
-
+			} else
+			{
+				getline(infile, addon);
+				line += addon;
+				parse(line);
+			}	
 			infile >> line;
 		}	
-		//if (line[line.length()-1] != ';')
-		// do we need to check if the program ends with a semicolon?
-		}
+	}
 				
-	};
+};
 	
 
 
