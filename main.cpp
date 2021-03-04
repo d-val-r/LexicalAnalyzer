@@ -69,6 +69,20 @@ private:
 	}
 
 	
+	int findLexeme(string target)
+	{
+		int i = 0;
+		int index = -1;
+		bool found = false;
+		while (i < lexemes.size() && !found)
+		{
+			if (lexemes[i] == target)
+				found = true;
+		}
+
+		return index;
+	}
+		
 
 
 	bool search_map_for(string target)
@@ -77,7 +91,7 @@ private:
 		bool found = false;
 		while (!found && itr != tokenmap.end())
 		{
-			if (itr->second == target)
+			if (itr->first == target)
 				found = true;
 			itr++;
 		}	
@@ -108,14 +122,16 @@ private:
 public:
 	LexAnalyzer(istream& infile)
 	{
-		string key;
-		string value;		
+		string lexeme;
+		string token;		
 		
-		infile >> key >> value;
+		infile >> token >> lexeme;
 		while (!infile.eof())
 		{
-			tokenmap[key] = value;
-			infile >> key >> value;
+			tokens.push_back(token);
+			lexemes.push_back(lexeme);
+			tokenmap[lexeme] = token;
+			infile >> token >> lexeme;
 		}	
 
 	}
