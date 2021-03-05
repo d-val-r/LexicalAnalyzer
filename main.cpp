@@ -149,14 +149,12 @@ public:
 		
 		string line;
 		getline(infile, line);
-
-		int start_quote = -1;
-		int end_quote = -1;		
 		
 		while (!infile.eof())
 		{
 			while (i < line.length() && !error)
 			{
+
 				if (line[i] == '"')
 				{
 					i++;
@@ -193,12 +191,15 @@ public:
 							outfile << "Error: invalid identifier " << parsed << line[i] << endl;
 							error = true;
 						}
-						else
+						else if (search_map_for(parsed))
 						{
 							outfile << tokenmap[parsed] << " : " << parsed << endl;
 							converter[0] = line[i];
 							outfile << tokenmap[converter] << " : " << converter << endl; 
 							converter = " ";
+						} else
+						{
+							outfile << "t_id : " << parsed << endl;
 						}
 					} else if(search_map_for(parsed))
 					{
@@ -221,14 +222,21 @@ public:
 							
 				} else if(isNumber(line[i]))
 				{
-					while (i < line.length() && !finished_parsing)
+					parsed += line[i];
+					i++;
+					while (i <= line.length() && !finished_parsing && (!(isWhiteSpace(line[i]) || line[i] == '\0')))
 					{
-						parsed += line[i];
+					/*	if (isWhiteSpace(line[i]) || line[i] == '\0')
+						{
+							outfile << "t_int : " << parsed << endl;	
+							finished_parsing = true;
+						} else*/ 
 						if (isSymbol(line[i]))
 						{
 							if (search_map_for(line[i]))
 							{
 								outfile << "t_int : " << parsed << endl;	
+								finished_parsing = true;
 							} else
 							{
 								outfile << "Error: Invalid Symbol " << line[i] << endl;
@@ -242,15 +250,17 @@ public:
 							error = true;
 							finished_parsing = true;
 
-						} else if (isWhiteSpace(line[i]) || line[i] == '\0')
-						{
-							outfile << "t_id : " << parsed << endl;	
-							finished_parsing = true;
-						}
-
+						} else
+							parsed += line[i];
 						i++;
 					}
 
+					if (line[i] == '\0' || isWhiteSpace(line[i]))
+					{
+						outfile << "t_int : " << parsed << endl;
+					}
+					
+					parsed = "";
 					finished_parsing = false;
 				}	
 				i++;
@@ -291,7 +301,10 @@ int main()
 	// 	main()
 	// 	"hello"
 
-	
+
+	file.close();
+	source_code.close();
+	output.close();	
 
 	return 0;
 }
