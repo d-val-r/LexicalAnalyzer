@@ -139,7 +139,7 @@ public:
 	
 	void scanFile(istream& infile, ostream& outfile)
 	{	
-				
+		string converter = " ";	
 		bool error = false;
 		int i = 0;
 		string parsed = "";
@@ -159,7 +159,7 @@ public:
 				{
 					i++;
 					parsed += getString(line, i);	
-					while (i <= line.length() && line[line.length()-1] != '"' && !infile.eof()) 
+					while (i >= line.length() && line[i] != '"' && !infile.eof()) 
 					{
 						getline(infile, line);
 						parsed += ' ';
@@ -171,7 +171,10 @@ public:
 					{	error = true;
 						outfile << "Error: unclosed string";
 					} else
+					{
 						outfile << "t_string : " << parsed << endl; 
+						parsed = "";
+					}
 					
 				} else if (isAlpha(line[i]))
 				{
@@ -181,9 +184,17 @@ public:
 						i++;
 					}
 					
-					if (isSymbol(line[i]) && !search_map_for(line[i]))
+					if (isSymbol(line[i]) && line[i] != '\0')
 					{
-						outfile << "invalid identifier" << endl;
+						if (!search_map_for(line[i]))
+							outfile << "Error: invalid identifier " << parsed << line[i] << endl;
+						else
+						{
+							outfile << tokenmap[parsed] << " : " << parsed << endl;
+							converter[0] = line[i];
+							outfile << tokenmap[converter] << " : " << converter << endl; 
+							converter = " ";
+						}
 					} else if(search_map_for(parsed))
 					{
 						outfile << tokenmap[parsed] << " : " << parsed << endl;
@@ -191,17 +202,19 @@ public:
 					else
 					{
 						outfile << "t_id : " << parsed << endl;
-						parsed = "";
 					}
+					parsed = "";
 				} else if(isSymbol(line[i]))
 				{
-					if (!(i > start_quote && i < end_quote))
+					if (search_map_for(line[i]))
 					{
-						if (!(search_map_for(line[i])))
-							outfile << "Invalid symbol";
+						converter[0] = line[i];
+						outfile << tokenmap[converter] << " : " << converter << endl;
+						converter = " ";
 					}
-				}
-
+						
+							
+				} 
 				i++;
 			}
 
