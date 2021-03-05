@@ -141,8 +141,10 @@ public:
 	{	
 		string converter = " ";	
 		bool error = false;
+		bool finished_parsing = false;
 		int i = 0;
 		string parsed = "";
+		
 		
 		
 		string line;
@@ -168,8 +170,8 @@ public:
 					}
 
 					if (infile.eof() && line[line.length()-1] != '"')
-					{	error = true;
-						outfile << "Error: unclosed string";
+					{	outfile << "Error: unclosed string";
+						error = true;
 					} else
 					{
 						outfile << "t_string : " << parsed << endl; 
@@ -187,7 +189,10 @@ public:
 					if (isSymbol(line[i]) && line[i] != '\0')
 					{
 						if (!search_map_for(line[i]))
+						{
 							outfile << "Error: invalid identifier " << parsed << line[i] << endl;
+							error = true;
+						}
 						else
 						{
 							outfile << tokenmap[parsed] << " : " << parsed << endl;
@@ -214,7 +219,40 @@ public:
 					}
 						
 							
-				} 
+				} else if(isNumber(line[i]))
+				{
+					while (i < line.length() && !finished_parsing)
+					{
+						parsed += line[i];
+						if (isSymbol(line[i]))
+						{
+							if (search_map_for(line[i]))
+							{
+								outfile << "t_int : " << parsed << endl;	
+							} else
+							{
+								outfile << "Error: Invalid Symbol " << line[i] << endl;
+								error = true;
+							}
+
+							finished_parsing = true;
+						} else if (isAlpha(line[i]))
+						{
+							outfile << "Error: Invalid Identifier " << parsed << endl;
+							error = true;
+							finished_parsing = true;
+
+						} else if (isWhiteSpace(line[i]) || line[i] == '\0')
+						{
+							outfile << "t_id : " << parsed << endl;	
+							finished_parsing = true;
+						}
+
+						i++;
+					}
+
+					finished_parsing = false;
+				}	
 				i++;
 			}
 
