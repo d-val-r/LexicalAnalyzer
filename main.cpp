@@ -195,14 +195,12 @@ public:
 						{
 							outfile << tokenmap[parsed] << " : " << parsed << endl;
 							converter[0] = line[i];
-							cout << converter << endl;
 							outfile << tokenmap[converter] << " : " << converter << endl; 
 							converter = " ";
 						} else
 						{
 							outfile << "t_id : " << parsed << endl;
 							converter[0] = line[i];
-							cout << converter << endl;
 							outfile << tokenmap[converter] << " : " << converter << endl; 
 							converter = " ";
 
@@ -216,13 +214,17 @@ public:
 						outfile << "t_id : " << parsed << endl;
 					}
 					parsed = "";
-				} else if(isSymbol(line[i]))
+				} else if(isSymbol(line[i])) // add conditions to check for compound symbols, <=, >=, ==, etc
 				{
 					if (search_map_for(line[i]))
 					{
 						converter[0] = line[i];
 						outfile << tokenmap[converter] << " : " << converter << endl;
 						converter = " ";
+					} else
+					{
+						outfile << "Error: Unrecognized Symbol : " << line[i] << endl;
+						error = true;
 					}
 						
 							
