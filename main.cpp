@@ -168,7 +168,7 @@ public:
 					}
 
 					if (infile.eof() && line[line.length()-1] != '"')
-					{	outfile << "Error: unclosed string";
+					{	outfile << "Error: unclosed string" << endl;
 						error = true;
 					} else
 					{
@@ -190,16 +190,22 @@ public:
 						{
 							outfile << "Error: invalid identifier " << parsed << line[i] << endl;
 							error = true;
-						}
+						} 
 						else if (search_map_for(parsed))
 						{
 							outfile << tokenmap[parsed] << " : " << parsed << endl;
 							converter[0] = line[i];
+							cout << converter << endl;
 							outfile << tokenmap[converter] << " : " << converter << endl; 
 							converter = " ";
 						} else
 						{
 							outfile << "t_id : " << parsed << endl;
+							converter[0] = line[i];
+							cout << converter << endl;
+							outfile << tokenmap[converter] << " : " << converter << endl; 
+							converter = " ";
+
 						}
 					} else if(search_map_for(parsed))
 					{
@@ -254,8 +260,11 @@ public:
 							parsed += line[i];
 						i++;
 					}
-
-					if (line[i] == '\0' || isWhiteSpace(line[i]))
+					
+					// we exited the loop due to reading until the end of the line,
+					// or we ran into whitespace along the way. Either way, the number
+					// didn't break any rules
+					if (!finished_parsing)
 					{
 						outfile << "t_int : " << parsed << endl;
 					}
