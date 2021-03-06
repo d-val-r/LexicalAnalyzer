@@ -9,7 +9,7 @@ Written by David Rudenya
 # include <map>
 using namespace std;
 
-class LexAnalyzer
+class LexAnalyzer // error messages JUST name the type of error
 {
 private:
 	vector<string> lexemes;
@@ -289,7 +289,7 @@ public:
 
 int main()
 {
-	ifstream file("tokenlexemedata.txt");
+	ifstream file("tokenlexemedata.txt"); // do NOT hard code this
 
 	string source_name;
 	cout << "Please enter a source code file name, with extension: ";
@@ -305,13 +305,6 @@ int main()
 
 	LexAnalyzer l(file);
 	l.scanFile(source_code, output);
-
-
-	// ARE RANDOM STRINGS CONSIDERED VALID SYNTAX?
-	// ex:
-	// 	main()
-	// 	"hello"
-
 
 	file.close();
 	source_code.close();
