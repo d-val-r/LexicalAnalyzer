@@ -201,13 +201,58 @@ public:
 				} else if(isSymbol(line[i])) // add conditions to check for compound symbols, <=, >=, ==, etc
 				{
 
-					if (search_map_for(line[i]))
+					if (i+1 < line.length())
 					{
+						if (line[i] == '&' && line[i+1] == '&')
+						{
+							outfile << tokenmap["&&"] << ": &&" << endl;
+							i++;
+						} else if (line[i] == '|' && line[i+1] == '|')
+						{
+							outfile << tokenmap["||"] << ": ||" << endl;
+							i++;
+						}
+					} else if (search_map_for(line[i]))
+					{
+						if (i+1 < line.length() && isSymbol(line[i+1]))
+						{
+							if (line[i+1] == '=')
+							{
+								if (line[i] == '<')
+								{
+									outfile << tokenmap["<="] << ": <=" << endl;
+									i++;
+								}
+								else if (line[i] == '>')
+								{
+									outfile << tokenmap[">="] << ": >=" << endl;
+									i++;
+								}
+								else if (line[i] == '=')
+								{
+									outfile << tokenmap["=="] << ": ==" << endl;
+									i++;
+								}
+								else if (line[i] == '!')
+								{	
+									outfile << tokenmap["!="] << ": !=" << endl;
+									i++;
+								}
+							} else
+							{
+								converter[0] = line[i];
+								outfile << tokenmap[converter] << " : " << converter << endl;
+								converter = " ";
+							}
+							
+						} else
+						{
+							converter[0] = line[i];
+							outfile << tokenmap[converter] << " : " << converter << endl;
+							converter = " ";
+						}
 						
 						
-						converter[0] = line[i];
-						outfile << tokenmap[converter] << " : " << converter << endl;
-						converter = " ";
 						
 					} else
 					{
