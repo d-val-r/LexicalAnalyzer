@@ -67,24 +67,7 @@ private:
 		
 		return is_white_space;
 	}
-
 	
-	int findLexeme(string target)
-	{
-		int i = 0;
-		int index = -1;
-		bool found = false;
-		while (i < lexemes.size() && !found)
-		{
-			if (lexemes[i] == target)
-				found = true;
-		}
-
-		return index;
-	}
-		
-
-
 	bool search_map_for(string target)
 	{
 		map<string, string>::iterator itr = tokenmap.begin();
@@ -159,7 +142,7 @@ public:
 				{
 					i++;
 					parsed += getString(line, i);	
-					while (i >= line.length() && line[i] != '"' && !infile.eof()) 
+					while (i >= line.length() && !infile.eof()) 
 					{
 						getline(infile, line);
 						parsed += ' ';
@@ -167,8 +150,8 @@ public:
 						parsed += getString(line, i);
 					}
 
-					if (infile.eof() && line[line.length()-1] != '"')
-					{	outfile << "Error: unclosed string" << endl;
+					if (infile.eof() && line[i] != '"')
+					{	outfile << "Error: Unclosed String" << endl;
 						error = true;
 					} else
 					{
@@ -188,21 +171,21 @@ public:
 					{
 						if (!search_map_for(line[i]))
 						{
-							outfile << "Error: invalid identifier " << parsed << line[i] << endl;
+							outfile << "Error: Invalid Symbol" << endl;
 							error = true;
 						} 
 						else if (search_map_for(parsed))
 						{
 							outfile << tokenmap[parsed] << " : " << parsed << endl;
-							converter[0] = line[i];
-							outfile << tokenmap[converter] << " : " << converter << endl; 
-							converter = " ";
+							//converter[0] = line[i];
+							//outfile << tokenmap[converter] << " : " << converter << endl; 
+							//converter = " ";
 						} else
 						{
 							outfile << "t_id : " << parsed << endl;
-							converter[0] = line[i];
-							outfile << tokenmap[converter] << " : " << converter << endl; 
-							converter = " ";
+							//converter[0] = line[i];
+							//outfile << tokenmap[converter] << " : " << converter << endl; 
+							//converter = " ";
 
 						}
 					} else if(search_map_for(parsed))
@@ -214,16 +197,21 @@ public:
 						outfile << "t_id : " << parsed << endl;
 					}
 					parsed = "";
+					i--;
 				} else if(isSymbol(line[i])) // add conditions to check for compound symbols, <=, >=, ==, etc
 				{
+
 					if (search_map_for(line[i]))
 					{
+						
+						
 						converter[0] = line[i];
 						outfile << tokenmap[converter] << " : " << converter << endl;
 						converter = " ";
+						
 					} else
 					{
-						outfile << "Error: Unrecognized Symbol : " << line[i] << endl;
+						outfile << "Error: Invalid Symbol" << endl;
 						error = true;
 					}
 						
@@ -234,11 +222,6 @@ public:
 					i++;
 					while (i <= line.length() && !finished_parsing && (!(isWhiteSpace(line[i]) || line[i] == '\0')))
 					{
-					/*	if (isWhiteSpace(line[i]) || line[i] == '\0')
-						{
-							outfile << "t_int : " << parsed << endl;	
-							finished_parsing = true;
-						} else*/ 
 						if (isSymbol(line[i]))
 						{
 							if (search_map_for(line[i]))
@@ -247,14 +230,14 @@ public:
 								finished_parsing = true;
 							} else
 							{
-								outfile << "Error: Invalid Symbol " << line[i] << endl;
+								outfile << "Error: Invalid Symbol" << endl;
 								error = true;
 							}
 
 							finished_parsing = true;
 						} else if (isAlpha(line[i]))
 						{
-							outfile << "Error: Invalid Identifier " << parsed << endl;
+							outfile << "Error: Invalid Identifier" << endl;
 							error = true;
 							finished_parsing = true;
 
