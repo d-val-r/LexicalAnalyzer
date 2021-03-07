@@ -207,7 +207,6 @@ public:
 						i++;	
 					} else if (line[i] == '|' && i+1 < line.length() && line[i+1] == '|')
 					{
-
 						outfile << tokenmap["||"] << ": ||" << endl;
 						i++;	
 					} else if (search_map_for(line[i]))
@@ -235,6 +234,11 @@ public:
 								{	
 									outfile << tokenmap["!="] << ": !=" << endl;
 									i++;
+								} else
+								{
+									converter[0] = line[i];
+									outfile << tokenmap[converter] << " : " << converter << endl;
+									converter = " ";
 								}
 							} else
 							{
@@ -270,11 +274,15 @@ public:
 							if (search_map_for(line[i]))
 							{
 								outfile << "t_int : " << parsed << endl;	
+								converter[0] = line[i];
+								outfile << tokenmap[converter] << ": " << converter << endl;
+								converter = " ";
 								finished_parsing = true;
 							} else
 							{
 								outfile << "Error: Invalid Symbol" << endl;
 								error = true;
+								finished_parsing = true;
 							}
 
 							finished_parsing = true;
@@ -286,7 +294,9 @@ public:
 
 						} else
 							parsed += line[i];
-						i++;
+						
+						if (!finished_parsing)
+							i++;
 					}
 					
 					// we exited the loop due to reading until the end of the line,
