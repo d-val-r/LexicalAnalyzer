@@ -101,6 +101,14 @@ private:
 		return parsed;
 
 	}
+
+	void write(ostream& outfile)
+	{
+		for (int i = 0; i < tokens.size(); i++)
+		{
+			outfile << tokens[i] << " : " << lexemes[i] << endl;
+		}
+	}
 	
 public:
 	LexAnalyzer(istream& infile)
@@ -111,8 +119,6 @@ public:
 		infile >> token >> lexeme;
 		while (!infile.eof())
 		{
-			tokens.push_back(token);
-			lexemes.push_back(lexeme);
 			tokenmap[lexeme] = token;
 			infile >> token >> lexeme;
 		}	
@@ -155,7 +161,8 @@ public:
 						error = true;
 					} else
 					{
-						outfile << "t_str : " << parsed << endl; 
+						tokens.push_back("t_str");
+						lexemes.push_back(parsed);
 						parsed = "";
 					}
 					
@@ -176,38 +183,38 @@ public:
 						} 
 						else if (search_map_for(parsed))
 						{
-							outfile << tokenmap[parsed] << " : " << parsed << endl;
-							//converter[0] = line[i];
-							//outfile << tokenmap[converter] << " : " << converter << endl; 
-							//converter = " ";
+							tokens.push_back(tokenmap[parsed]);
+							lexemes.push_back(parsed);
 						} else
 						{
-							outfile << "t_id : " << parsed << endl;
-							//converter[0] = line[i];
-							//outfile << tokenmap[converter] << " : " << converter << endl; 
-							//converter = " ";
+							tokens.push_back("t_id"); 
+							lexemes.push_back(parsed);
 
 						}
 					} else if(search_map_for(parsed))
 					{
-						outfile << tokenmap[parsed] << " : " << parsed << endl;
+						tokens.push_back(tokenmap[parsed]);
+						lexemes.push_back(parsed);
 					}
 					else
 					{
-						outfile << "t_id : " << parsed << endl;
+						tokens.push_back("t_id"); 
+						lexemes.push_back(parsed);
 					}
 					parsed = "";
 					i--;
-				} else if(isSymbol(line[i])) // add conditions to check for compound symbols, <=, >=, ==, etc
+				} else if(isSymbol(line[i])) 
 				{
 
 					if (line[i] == '&' && i+1 < line.length() && line[i+1] == '&')
 					{
-						outfile << tokenmap["&&"] << ": &&" << endl;
+						tokens.push_back(tokenmap["&&"]);
+						lexemes.push_back("&&");	
 						i++;	
 					} else if (line[i] == '|' && i+1 < line.length() && line[i+1] == '|')
 					{
-						outfile << tokenmap["||"] << ": ||" << endl;
+						tokens.push_back(tokenmap["||"]);
+					        lexemes.push_back("||");	
 						i++;	
 					} else if (search_map_for(line[i]))
 					{
@@ -217,40 +224,47 @@ public:
 							{
 								if (line[i] == '<')
 								{
-									outfile << tokenmap["<="] << ": <=" << endl;
+									tokens.push_back(tokenmap["<="]); 
+									lexemes.push_back("<=");
 									i++;
 								}
 								else if (line[i] == '>')
 								{
-									outfile << tokenmap[">="] << ": >=" << endl;
+									tokens.push_back(tokenmap[">="]);
+								        lexemes.push_back(">=");	
 									i++;
 								}
 								else if (line[i] == '=')
 								{
-									outfile << tokenmap["=="] << ": ==" << endl;
+									tokens.push_back(tokenmap["=="]); 
+									lexemes.push_back("==");
 									i++;
 								}
 								else if (line[i] == '!')
 								{	
-									outfile << tokenmap["!="] << ": !=" << endl;
+									tokens.push_back(tokenmap["!="]); 
+									lexemes.push_back("!=");
 									i++;
 								} else
 								{
 									converter[0] = line[i];
-									outfile << tokenmap[converter] << " : " << converter << endl;
+									tokens.push_back(tokenmap[converter]);
+								        lexemes.push_back(converter);	
 									converter = " ";
 								}
 							} else
 							{
 								converter[0] = line[i];
-								outfile << tokenmap[converter] << " : " << converter << endl;
+								tokens.push_back(tokenmap[converter]);
+							        lexemes.push_back(converter);	
 								converter = " ";
 							}
 							
 						} else
 						{
 							converter[0] = line[i];
-							outfile << tokenmap[converter] << " : " << converter << endl;
+							tokens.push_back(tokenmap[converter]);
+						        lexemes.push_back(converter);	
 							converter = " ";
 						}
 						
@@ -258,7 +272,8 @@ public:
 						
 					} else
 					{
-						outfile << "Error: Invalid Symbol" << endl;
+						tokens.push_back("Error: Invalid Symbol"); 
+						lexemes.push_back("");
 						error = true;
 					}
 						
@@ -273,14 +288,17 @@ public:
 						{
 							if (search_map_for(line[i]))
 							{
-								outfile << "t_int : " << parsed << endl;	
+								tokens.push_back("t_int");
+								lexemes.push_back(parsed);
 								converter[0] = line[i];
-								outfile << tokenmap[converter] << ": " << converter << endl;
+								tokens.push_back(tokenmap[converter]);
+								lexemes.push_back(converter);
 								converter = " ";
 								finished_parsing = true;
 							} else
 							{
-								outfile << "Error: Invalid Symbol" << endl;
+								tokens.push_back("Error: Invalid Symbol");
+								lexemes.push_back("");
 								error = true;
 								finished_parsing = true;
 							}
@@ -288,7 +306,8 @@ public:
 							finished_parsing = true;
 						} else if (isAlpha(line[i]))
 						{
-							outfile << "Error: Invalid Identifier" << endl;
+							tokens.push_back("Error: Invalid Identifier"); 
+							lexemes.push_back("");
 							error = true;
 							finished_parsing = true;
 
@@ -304,7 +323,8 @@ public:
 					// didn't break any rules
 					if (!finished_parsing)
 					{
-						outfile << "t_int : " << parsed << endl;
+						tokens.push_back("t_int"); 
+						lexemes.push_back(parsed);
 					}
 					
 					parsed = "";
@@ -316,6 +336,8 @@ public:
 			i = 0;
 			getline(infile, line);
 		}
+
+		write(outfile);
 	}
 				
 };
