@@ -9,7 +9,7 @@ Written by David Rudenya
 # include <map>
 using namespace std;
 
-class LexAnalyzer // error messages JUST name the type of error
+class LexAnalyzer 
 {
 private:
 	vector<string> lexemes;
@@ -155,7 +155,7 @@ public:
 						error = true;
 					} else
 					{
-						outfile << "t_string : " << parsed << endl; 
+						outfile << "t_str : " << parsed << endl; 
 						parsed = "";
 					}
 					
