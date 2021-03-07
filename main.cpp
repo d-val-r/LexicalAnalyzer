@@ -290,11 +290,8 @@ public:
 							{
 								tokens.push_back("t_int");
 								lexemes.push_back(parsed);
-								converter[0] = line[i];
-								tokens.push_back(tokenmap[converter]);
-								lexemes.push_back(converter);
-								converter = " ";
 								finished_parsing = true;
+								i--;
 							} else
 							{
 								tokens.push_back("Error: Invalid Symbol");
