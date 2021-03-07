@@ -201,17 +201,15 @@ public:
 				} else if(isSymbol(line[i])) // add conditions to check for compound symbols, <=, >=, ==, etc
 				{
 
-					if (i+1 < line.length())
+					if (line[i] == '&' && i+1 < line.length() && line[i+1] == '&')
 					{
-						if (line[i] == '&' && line[i+1] == '&')
-						{
-							outfile << tokenmap["&&"] << ": &&" << endl;
-							i++;
-						} else if (line[i] == '|' && line[i+1] == '|')
-						{
-							outfile << tokenmap["||"] << ": ||" << endl;
-							i++;
-						}
+						outfile << tokenmap["&&"] << ": &&" << endl;
+						i++;	
+					} else if (line[i] == '|' && i+1 < line.length() && line[i+1] == '|')
+					{
+
+						outfile << tokenmap["||"] << ": ||" << endl;
+						i++;	
 					} else if (search_map_for(line[i]))
 					{
 						if (i+1 < line.length() && isSymbol(line[i+1]))
@@ -265,7 +263,7 @@ public:
 				{
 					parsed += line[i];
 					i++;
-					while (i <= line.length() && !finished_parsing && (!(isWhiteSpace(line[i]) || line[i] == '\0')))
+					while (i < line.length() && !finished_parsing && !isWhiteSpace(line[i]))
 					{
 						if (isSymbol(line[i]))
 						{
