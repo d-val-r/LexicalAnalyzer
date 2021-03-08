@@ -7,6 +7,8 @@ Written by David Rudenya
 # include <iostream>
 # include <vector>
 # include <map>
+# include <string>
+
 using namespace std;
 
 class LexAnalyzer 
