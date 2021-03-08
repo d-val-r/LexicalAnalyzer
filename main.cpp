@@ -240,23 +240,16 @@ private:
 				tokens.push_back("Error: Invalid Symbol");
 				error = true;
 			} 
-			// the above statement did not flag the symbol as
-			// invalid, so either the string of characters is a keyword
-			// or an identifier
-			else if (search_map_for(parsed))
-			{
-				tokens.push_back(tokenmap[parsed]);
-				lexemes.push_back(parsed);
-			} else
-			{
-				tokens.push_back("t_id"); 
-				lexemes.push_back(parsed);
-
-			}
+			
 		} 
-		// no symbol found, so the loop either
-		// reached the end of the line or found other whitespace 
-		else if(search_map_for(parsed))
+
+		// if the above if statement found an invalid symbol, the 
+		// below conditionals are ignored; if the symbol was valid, or
+		// if no symbol was encountered (meaning the loop exited by 
+		// running out of text to read, found other whitespace, or 
+		// encountered a double quote), then the characters 
+		// form either a keyword or an identifier 
+		if(!error && search_map_for(parsed))
 		{
 			tokens.push_back(tokenmap[parsed]);
 			lexemes.push_back(parsed);
@@ -271,8 +264,8 @@ private:
 		// decrement i, because if line[i] was a symbol, the next
 		// iteration of the main loop has to process it (without this
 		// decrement, the loop calling this function will skip
-		// line[i] when it increments i on line 539; or, 
-		// if whitespace,the loop will just skip it
+		// line[i] when it increments i on line 521; or, 
+		// if whitespace,the loop will just ignore it
 		i--;
 
 		return error;
