@@ -16,8 +16,8 @@ private:
 	vector<string> tokens;
 	map<string, string> tokenmap;
 
-	bool isNumber(int a)
-	// pre: parameter accepts a character argument and auto-casts it into an int
+	bool isNumber(char a)
+	// pre: parameter accepts a character argument 
 	// post: returns true if the argument is a number; false if not
 	{
 		bool is_number = false;
@@ -34,7 +34,6 @@ private:
 	// pre: parameter is any character
 	// post: returns true if the argument is a letter; false otherwise
 	{
-		a = (int) a;
 		bool is_alpha = false;
 
 		// checks if the argument's ASCII code corresponds to a valid letter
@@ -48,7 +47,6 @@ private:
 	// pre: parameter is any character
 	// post: returns true if the character is either a tab or space character
 	{	
-		a = (int) a;
 		bool is_white_space = false;
 
 		// ASCII codes for tab and space chars	
@@ -421,9 +419,9 @@ private:
 
 		while (i < line.length() && !finished_parsing && !isWhiteSpace(line[i]))
 		{
-			if (isSymbol(line[i]))
+			if (isSymbol(line[i]) || line[i] == '|' || line[i] == '&')
 			{
-				if (search_map_for(line[i]))
+				if (search_map_for(line[i]) || line[i] == '|' || line[i] == '&')
 				{
 					tokens.push_back("t_int");
 					lexemes.push_back(parsed);
